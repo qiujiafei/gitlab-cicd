@@ -1,0 +1,19 @@
+stages:
+  - test
+  - deploy
+
+test-job:
+  stage: test
+  tags:
+    - golang-test
+  script:
+    - go test ./test
+
+deploy-job:
+  stage: deploy
+  tags:
+    - docker-deploy
+  script:
+    - docker build -t gohttp .
+    - if [ $(docker ps -aq --filter name=helloworld) ]; then docker rm -f helloworld;fi
+    - docker run -d -p 9090:9090 --name helloworld gohttp
